@@ -20,7 +20,10 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas'); // lanza una excepción de credenciales inválidas
     }
 
-    const isPasswordValid = await bcrypt.compare(LoginDto.password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      LoginDto.password,
+      user.password,
+    );
 
     // acá se valida la contraseña usando el servicio de usuarios
     if (!isPasswordValid) {
