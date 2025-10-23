@@ -98,19 +98,20 @@ DB_DB=**\*\*\***
 ````bash
 bun run start:dev
 
-
-```bash
+```
+---## 📚 Documentación de la API
 
 #Endpoints
-
+```bash
 | Método   | Endpoint         | Descripción                                | Códigos de respuesta                |
 | :------- | :--------------- | :----------------------------------------- | :---------------------------------- |
 | `GET`    | `/proveedor`     | Obtiene todos los proveedores              | `200 OK`                            |
 | `GET`    | `/proveedor/:id` | Obtiene un proveedor por su ID             | `200 OK`, `400 Bad Request`         |
 | `POST`   | `/proveedor`     | Crea un nuevo proveedor (validado con Zod) | `201 Created`, `400 Bad Request`    |
 | `DELETE` | `/proveedor/:id` | Elimina un proveedor por ID                | `204 No Content`, `400 Bad Request` |
-
----## 🚀 Uso
+```
+---
+## 🚀 Uso
 
 La aplicación estará disponible en `http://localhost:3000`.
 
