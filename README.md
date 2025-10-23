@@ -83,11 +83,12 @@ $ bun install
 ```bash
 # Renombrar el archivo .env.example a .env
 
-DB_HOST=aws-1-**-\*\***-\*.**\*\*\***.**\*\*\*\***.com
-DB_PORT=\***\*
-DB_USER=\*\*\*\***.\***\*\*\*\*\*\***
-DB_PASSWORD=\***\*\*\*\***
-DB_DB=**\*\*\***
+DB_HOST=aws-1-**-****-*.*******.********.com
+DB_PORT=****
+DB_USER=******.***********
+DB_PASSWORD=*********
+DB_DB=*******
+
 
 ⚠️ Estas variables son usadas por TypeORM para conectarse a la base de datos PostgreSQL.
 
@@ -95,14 +96,16 @@ DB_DB=**\*\*\***
 
 ### Ejecutar la aplicación
 
-````bash
+```bash
 bun run start:dev
 
 ```
----## 📚 Documentación de la API
+
+## 📚 Documentación de la API
 
 #Endpoints
-```bash
+
+```markdown
 | Método   | Endpoint         | Descripción                                | Códigos de respuesta                |
 | :------- | :--------------- | :----------------------------------------- | :---------------------------------- |
 | `GET`    | `/proveedor`     | Obtiene todos los proveedores              | `200 OK`                            |
@@ -110,9 +113,3 @@ bun run start:dev
 | `POST`   | `/proveedor`     | Crea un nuevo proveedor (validado con Zod) | `201 Created`, `400 Bad Request`    |
 | `DELETE` | `/proveedor/:id` | Elimina un proveedor por ID                | `204 No Content`, `400 Bad Request` |
 ```
----
-## 🚀 Uso
-
-La aplicación estará disponible en `http://localhost:3000`.
-
-````
