@@ -29,6 +29,7 @@ export class ProveedorController {
   }
 
   @Post()
+  @HttpCode(201) // Indica que la respuesta será 201 Created
   async createProveedor(@Body() body: any) {
     //Validar con zod
     const result = CreateProveedorDto.safeParse(body);
