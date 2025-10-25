@@ -52,4 +52,11 @@ export class ProveedorController {
       throw new BadRequestException(error.message);
     }
   }
+
+  //Total de proveedores
+  @Get('count/total')
+  async countProveedores() {
+    console.log(await this.proveedorService.countProveedores());
+    return this.proveedorService.countProveedores();
+  }
 }

@@ -60,8 +60,14 @@ export class ProveedorService {
   // Delete proveedor
   async deleteProveedor(id: number): Promise<void> {
     const resultado = await this.proveedorRepo.delete(id);
-    if (resultado.affected === 0) { // Ningún registro fue eliminado
+    if (resultado.affected === 0) {
+      // Ningún registro fue eliminado
       throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
     }
+  }
+
+  //Total de proveedores
+  async countProveedores(): Promise<number> {
+    return this.proveedorRepo.count();
   }
 }
