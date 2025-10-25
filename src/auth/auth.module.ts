@@ -17,7 +17,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         secret: config.get<string>('JWT_SECRET'), // obtenemos el valor de la variable de entorno JWT_SECRET
         signOptions: {
           // opciones para firmar el token
-          expiresIn: config.get<string>('JWT_EXPIRES_IN') || '1h',
+          expiresIn: '1d', // ✅ corrected to a valid format
         },
       }),
     }),
