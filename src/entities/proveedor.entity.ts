@@ -4,7 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { CategoriaProveedor } from './categoria-proveedor.entity';
 
 @Entity('proveedor') // es para especificar el nombre de la tabla en la base de datos
 export class Proveedor {
@@ -43,8 +46,9 @@ export class Proveedor {
   fecha_actualizacion: Date;
 
   // Relaciones con otras entidades (si las hay)
-  //   @ManyToOne(() => CategoriaProveedor, categoria => categoria.proveedores)
-  //   id_categoria: CategoriaProveedor;
+  @ManyToOne(() => CategoriaProveedor, (categoria) => categoria.proveedores)
+  @JoinColumn({ name: 'id_categoria' })
+  categoria: CategoriaProveedor;
 
   //   @OneToMany(() => EvaluacionProveedor, evaluacion => evaluacion.id_proveedor)
   //   evaluaciones: EvaluacionProveedor[];
