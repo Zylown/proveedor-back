@@ -10,7 +10,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Proveedor } from './proveedor.entity';
+import { Proveedor } from '../entities/proveedor.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -69,5 +69,10 @@ export class ProveedorService {
   //Total de proveedores
   async countProveedores(): Promise<number> {
     return this.proveedorRepo.count();
+  }
+
+  // Listar proveedores con su categoría
+  async listarProveedores() {
+    return this.proveedorRepo.find({ relations: ['categoria'] });
   }
 }

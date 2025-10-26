@@ -59,4 +59,10 @@ export class ProveedorController {
     console.log(await this.proveedorService.countProveedores());
     return this.proveedorService.countProveedores();
   }
+
+  // Listar proveedores con su categoría
+  @Get('listar/con-categoria')
+  async listarProveedores() {
+    return this.proveedorService.listarProveedores();
+  }
 }
