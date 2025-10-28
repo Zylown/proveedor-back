@@ -1,5 +1,5 @@
 import { DashboardService } from './dashboard.service';
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 
 @Controller('dashboard')
 export class DashboardController {
@@ -8,5 +8,15 @@ export class DashboardController {
   @Get('kpis')
   async obtenerKpis() {
     return this.DashboardService.obtenerKpis();
+  }
+
+  @Get('actividad-reciente')
+  async actividadReciente() {
+    return this.DashboardService.getRecentHighlights();
+  }
+
+  @Get('proveedores-destacados')
+  async getFeatured() {
+    return this.DashboardService.getFeatured();
   }
 }
