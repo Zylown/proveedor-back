@@ -10,7 +10,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Proveedor } from '../entities/proveedor.entity';
+import { Proveedor } from './entities/proveedor.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()

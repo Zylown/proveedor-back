@@ -5,6 +5,12 @@ import { ConfigModule } from '@nestjs/config';
 import { ProveedorModule } from './proveedor/proveedor.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { OrdenModule } from './orden/orden.module';
+import { EntregaController } from './entrega/entrega.controller';
+import { EntregaModule } from './entrega/entrega.module';
+import { FacturaService } from './factura/factura.service';
+import { FacturaController } from './factura/factura.controller';
+import { FacturaModule } from './factura/factura.module';
 
 @Module({
   imports: [
@@ -27,6 +33,9 @@ import { DashboardModule } from './dashboard/dashboard.module';
     UsersModule,
     ProveedorModule,
     DashboardModule,
+    OrdenModule,
+    EntregaModule,
+    FacturaModule,
   ],
 })
 export class AppModule {}
