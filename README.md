@@ -103,13 +103,51 @@ bun run start:dev
 
 ## 📚 Documentación de la API
 
-#Endpoints
+## 🔌 Endpoints
 
-```markdown
-| Método   | Endpoint         | Descripción                                | Códigos de respuesta                |
-| :------- | :--------------- | :----------------------------------------- | :---------------------------------- |
-| `GET`    | `/proveedor`     | Obtiene todos los proveedores              | `200 OK`                            |
-| `GET`    | `/proveedor/:id` | Obtiene un proveedor por su ID             | `200 OK`, `400 Bad Request`         |
-| `POST`   | `/proveedor`     | Crea un nuevo proveedor (validado con Zod) | `201 Created`, `400 Bad Request`    |
-| `DELETE` | `/proveedor/:id` | Elimina un proveedor por ID                | `204 No Content`, `400 Bad Request` |
-```
+### Proveedor
+
+| Método   | Endpoint                          | Descripción                       | Códigos de respuesta                |
+| :------- | :-------------------------------- | :-------------------------------- | :---------------------------------- |
+| `GET`    | `/proveedor`                      | Lista todos los proveedores       | `200 OK`                            |
+| `GET`    | `/proveedor/:id`                  | Obtiene un proveedor por ID       | `200 OK`, `400 Bad Request`         |
+| `POST`   | `/proveedor`                      | Crea proveedor (validado con Zod) | `201 Created`, `400 Bad Request`    |
+| `DELETE` | `/proveedor/:id`                  | Elimina proveedor por ID          | `204 No Content`, `400 Bad Request` |
+| `GET`    | `/proveedor/count/total`          | Total de proveedores              | `200 OK`                            |
+| `GET`    | `/proveedor/listar/con-categoria` | Proveedores con su categoría      | `200 OK`                            |
+
+### Dashboard
+
+| Método | Endpoint                        | Descripción                                                                           | Códigos de respuesta |
+| :----- | :------------------------------ | :------------------------------------------------------------------------------------ | :------------------- |
+| `GET`  | `/dashboard/kpis`               | KPIs principales (proveedores, órdenes activas, pagos pendientes, etc.)               | `200 OK`             |
+| `GET`  | `/dashboard/actividad-reciente` | Highlights: última orden completada, última entrega retrasada, último proveedor nuevo | `200 OK`             |
+| `GET`  | `/dashboard/featured`           | Proveedores destacados del mes (desempeño, puntualidad, calidad)                      | `200 OK`             |
+
+### Órdenes
+
+| Método | Endpoint          | Descripción                                                                                   | Query params (opc.)                                                             | Códigos  |
+| :----- | :---------------- | :-------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------ | :------- |
+| `GET`  | `/orders`         | **Órdenes registradas** (lista completa; ordenadas por fecha_emision desc)                    | `page`, `limit`, `proveedor`, `estado` (`pendiente`\|`completada`\|`cancelada`) | `200 OK` |
+| `GET`  | `/orders/summary` | **Resumen de órdenes** (completadas, pendientes, canceladas, variación % mes vs mes anterior) | —                                                                               | `200 OK` |
+
+> Nota: si no envías `estado` en `/orders`, por defecto lista **pendientes** (configurable en el servicio).
+
+### Entregas
+
+| Método | Endpoint           | Descripción                                                               | Códigos  |
+| :----- | :----------------- | :------------------------------------------------------------------------ | :------- |
+| `GET`  | `/entrega`         | **Entregas registradas** (con proveedor y dirección)                      | `200 OK` |
+| `GET`  | `/entrega/resumen` | **Resumen de entregas** (entregadas, en tránsito, retrasadas, canceladas) | `200 OK` |
+
+> Estado de presentación en la lista:  
+> `completada` → **Entregado** · `pendiente` → **En tránsito** (el front puede marcar **Retrasado** si la estimada ya venció) · `cancelada` → **Cancelado**.
+
+### Facturas
+
+| Método | Endpoint            | Descripción                                                                           | Códigos  |
+| :----- | :------------------ | :------------------------------------------------------------------------------------ | :------- |
+| `GET`  | `/invoices`         | **Facturas registradas** (con proveedor, estado presentado: Pagado/Pendiente/Vencido) | `200 OK` |
+| `GET`  | `/invoices/summary` | **Resumen financiero** (pagadas, pendientes, vencidas, total ingresado por pagos)     | `200 OK` |
+
+---
