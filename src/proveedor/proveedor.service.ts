@@ -1,7 +1,4 @@
-import {
-  CreateProveedorDto,
-  CreateProveedorDtoType,
-} from './dto/create-proveedor.dto';
+import { CreateProveedorDtoType } from './dto/create-proveedor.dto';
 import {
   BadRequestException,
   ConflictException,
@@ -12,6 +9,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Proveedor } from './entities/proveedor.entity';
 import { Repository } from 'typeorm';
+import { ListProveedorQueryDtoType } from './dto/query-proveedor.dto';
+import { UpdateProveedorDtoType } from './dto/update-proveedor.dto';
 
 @Injectable()
 export class ProveedorService {
@@ -19,6 +18,51 @@ export class ProveedorService {
     @InjectRepository(Proveedor)
     private readonly proveedorRepo: Repository<Proveedor>,
   ) {}
+
+  async findAllPaged(query: ListProveedorQueryDtoType) {
+    const { page, limit, search, estado, categoriaId, sortBy, order } = query;
+    const qb = this.proveedorRepo
+      .createQueryBuilder('p')
+      .leftJoinAndSelect('p.categoria', 'c'); // qb = query builder
+
+    if (search?.trim()) {
+      // esto es para evitar búsquedas con solo espacios en blanco
+      qb.andWhere(
+        '(p.razon_social ILIKE :s OR p.ruc ILIKE :s OR p.email ILIKE :s OR p.telefono ILIKE :s)',
+        { s: `%${search.trim()}%` },
+      );
+    }
+
+    if (estado) {
+      // filtro por estado
+      qb.andWhere('p.estado = :estado', { estado });
+    }
+
+    if (categoriaId) {
+      // filtro por categoría
+      qb.andWhere('c.id_categoria = :categoriaId', { categoriaId });
+    }
+
+    const sortCol = // determinar la columna de ordenamiento
+      sortBy === 'razon_social'
+        ? 'p.razon_social'
+        : sortBy === 'calificacion_promedio'
+          ? 'p.calificacion_promedio'
+          : 'p.fecha_creacion';
+
+    qb.orderBy(sortCol, order.toUpperCase() as 'ASC' | 'DESC') // ordenamiento
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [items, total] = await qb.getManyAndCount(); // obtener resultados y total
+
+    return {
+      total,
+      page,
+      limit,
+      items,
+    };
+  }
 
   // Obtener todos los proveedores
   findAll(): Promise<Proveedor[]> {
@@ -57,6 +101,48 @@ export class ProveedorService {
     }
   }
 
+  // === Actualizar ===
+  async updateProveedor(
+    id: number,
+    data: UpdateProveedorDtoType,
+  ): Promise<Proveedor> {
+    const current = await this.proveedorRepo.findOne({
+      where: { id_proveedor: id },
+    });
+    if (!current)
+      throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
+
+    // Validar RUC duplicado si se envía y cambia
+    if (data.ruc && data.ruc !== current.ruc) {
+      const exists = await this.proveedorRepo.findOne({
+        where: { ruc: data.ruc },
+      });
+      if (exists)
+        throw new ConflictException('Ya existe un proveedor con ese RUC');
+    }
+
+    // Validar email duplicado si cambia
+    if (data.email && data.email !== current.email) {
+      const emailExists = await this.proveedorRepo.findOne({
+        where: { email: data.email },
+      });
+      if (emailExists)
+        throw new ConflictException('El email de proveedor ya existe');
+    }
+
+    // Mapear id_categoria si viene
+    const payload: Partial<Proveedor> = {
+      ...current,
+      ...data,
+      ...(data.id_categoria
+        ? { categoria: { id_categoria: data.id_categoria } as any }
+        : {}),
+    };
+
+    const saved = await this.proveedorRepo.save(payload);
+    return saved;
+  }
+
   // Delete proveedor
   async deleteProveedor(id: number): Promise<void> {
     const resultado = await this.proveedorRepo.delete(id);
@@ -64,11 +150,6 @@ export class ProveedorService {
       // Ningún registro fue eliminado
       throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
     }
-  }
-
-  //Total de proveedores
-  async countProveedores(): Promise<number> {
-    return this.proveedorRepo.count();
   }
 
   // Listar proveedores con su categoría
