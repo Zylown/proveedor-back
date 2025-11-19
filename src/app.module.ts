@@ -11,6 +11,7 @@ import { EntregaModule } from './entrega/entrega.module';
 import { FacturaService } from './factura/factura.service';
 import { FacturaController } from './factura/factura.controller';
 import { FacturaModule } from './factura/factura.module';
+import { EvaluacionModule } from './evaluacion/evaluacion.module';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { FacturaModule } from './factura/factura.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DB,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false, // solo para desarrollo, luego cambiar a false porque puede causar pérdida de datos
+      synchronize: false, // solo para desarrollo en true, luego cambiar a false porque puede causar pérdida de datos
     }),
 
     AuthModule,
@@ -36,6 +37,7 @@ import { FacturaModule } from './factura/factura.module';
     OrdenModule,
     EntregaModule,
     FacturaModule,
+    EvaluacionModule,
   ],
 })
 export class AppModule {}

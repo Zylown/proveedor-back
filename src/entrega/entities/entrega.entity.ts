@@ -6,6 +6,8 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('entrega')
@@ -31,6 +33,12 @@ export class Entrega {
   @ManyToOne(() => OrdenCompra, { eager: true })
   @JoinColumn({ name: 'id_orden' })
   orden: OrdenCompra;
+
+  @CreateDateColumn({ type: 'timestamptz' })
+  fecha_creacion: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz' })
+  fecha_actualizacion: Date;
 
   // proveedor via orden (join anidado)
   // si prefieres, puedes no mapear aquí y hacer join en el repositorio
