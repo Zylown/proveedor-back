@@ -12,6 +12,9 @@ import { FacturaService } from './factura/factura.service';
 import { FacturaController } from './factura/factura.controller';
 import { FacturaModule } from './factura/factura.module';
 import { EvaluacionModule } from './evaluacion/evaluacion.module';
+import { CategoriaProveedorService } from './categoria-proveedor/categoria-proveedor.service';
+import { CategoriaProveedorController } from './categoria-proveedor/categoria-proveedor.controller';
+import { CategoriaProveedorModule } from './categoria-proveedor/categoria-proveedor.module';
 
 @Module({
   imports: [
@@ -38,6 +41,7 @@ import { EvaluacionModule } from './evaluacion/evaluacion.module';
     EntregaModule,
     FacturaModule,
     EvaluacionModule,
+    CategoriaProveedorModule,
   ],
 })
 export class AppModule {}
