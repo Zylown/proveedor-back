@@ -8,19 +8,20 @@ import { VistaProveedoresDestacadosMes } from './entities/proveedores-destacados
 @Injectable()
 export class DashboardService {
   constructor(
-    @InjectRepository(VistaDashboardKpis) // Inyecta el repositorio de la vista
+    @InjectRepository(VistaDashboardKpis)
     private readonly dashboardRepo: Repository<VistaDashboardKpis>,
+
     @InjectRepository(VistaActividadReciente)
     private readonly actividadRecienteRepo: Repository<VistaActividadReciente>,
+
     @InjectRepository(VistaProveedoresDestacadosMes)
     private readonly proveedoresDestacadosRepo: Repository<VistaProveedoresDestacadosMes>,
   ) {}
 
-  // Método para obtener los KPIs del dashboard 1 que ya funciona
+  // =============================
+  //   KPIs PRINCIPALES
+  // =============================
   async obtenerKpis(): Promise<VistaDashboardKpis | null> {
-    // Retorna los KPIs del dashboard o null si no hay datos
-    // const data = await this.dashboardRepo.find(); // Obtiene todos los registros de la vista
-    // return data.length ? data[0] : null;
     const row = (await this.dashboardRepo.find())[0];
     if (!row) return null;
 
@@ -31,12 +32,14 @@ export class DashboardService {
       nuevas_hoy: row.nuevas_hoy,
       entregas_pendientes: row.entregas_pendientes,
       retrasadas: row.retrasadas,
-      pagos_pendientes: Number(row.pagos_pendientes ?? 0).toString(), // Asegura que sea string aunque sea '0'
+      pagos_pendientes: Number(row.pagos_pendientes ?? 0).toString(),
       facturas_vencidas: row.facturas_vencidas,
     };
   }
 
-  // === ACTIVIDAD RECIENTE: SOLO 3 HIGHLIGHTS ===
+  // =============================
+  //   ACTIVIDAD RECIENTE
+  // =============================
   async getRecentHighlights() {
     const qb = this.actividadRecienteRepo.createQueryBuilder('v');
 
@@ -64,7 +67,6 @@ export class DashboardService {
         .getOne(),
     ]);
 
-    // Devuelve shape directo para la card (frontend ya formatea "hace X" con v.ts)
     return {
       ultimaOrdenCompletada: ultimaOrdenCompletada
         ? {
@@ -75,19 +77,21 @@ export class DashboardService {
             proveedor: ultimaOrdenCompletada.proveedor,
           }
         : null,
+
       ultimaEntregaRetrasada: ultimaEntregaRetrasada
         ? {
             titulo: ultimaEntregaRetrasada.titulo,
-            subtitulo: ultimaEntregaRetrasada.subtitulo, // "Orden #... - Estimado: DD/MM/YYYY"
+            subtitulo: ultimaEntregaRetrasada.subtitulo,
             ts: ultimaEntregaRetrasada.ts,
             numero_orden: ultimaEntregaRetrasada.numero_orden,
             proveedor: ultimaEntregaRetrasada.proveedor,
           }
         : null,
+
       ultimoProveedorNuevo: ultimoProveedorNuevo
         ? {
-            titulo: ultimoProveedorNuevo.titulo, // "Nuevo proveedor registrado"
-            subtitulo: ultimoProveedorNuevo.subtitulo, // razón social
+            titulo: ultimoProveedorNuevo.titulo,
+            subtitulo: ultimoProveedorNuevo.subtitulo,
             ts: ultimoProveedorNuevo.ts,
             proveedor: ultimoProveedorNuevo.proveedor,
           }
@@ -95,17 +99,42 @@ export class DashboardService {
     };
   }
 
-  // Obtener proveedores destacados del mes
+  // =============================
+  //   PROVEEDORES DESTACADOS
+  // =============================
   async getFeatured() {
     const all = await this.proveedoresDestacadosRepo.find();
 
-    const mejorDesempeno = [...all] // clonar el array antes de ordenar
-      .sort((a, b) => b.ordenes_completadas_mes - a.ordenes_completadas_mes) // ordenar desc por ordenes completadas
-      .slice(0, 3); // tomar los top 3 proveedores destacados
+    if (!all || all.length === 0) {
+      return {
+        mejorDesempeno: [],
+        mejorPuntualidad: [],
+        mejorCalidad: [],
+        alerta: 'No hay datos registrados este mes.',
+      };
+    }
+
+    // UMBRALES
+    const UMBRAL = 85;
+
+    // Score = puntualidad + calidad (si un proveedor no tiene datos, se considera 0)
+    const mejorDesempeno = [...all]
+      .sort((a, b) => {
+        const scoreA =
+          (Number(a.puntualidad_pct_mes) || 0) +
+          (Number(a.calidad_promedio_mes) || 0);
+        const scoreB =
+          (Number(b.puntualidad_pct_mes) || 0) +
+          (Number(b.calidad_promedio_mes) || 0);
+        return scoreB - scoreA;
+      })
+      .slice(0, 3);
 
     const mejorPuntualidad = [...all]
       .filter((x) => x.puntualidad_pct_mes !== null)
-      .sort((a, b) => b.puntualidad_pct_mes! - a.puntualidad_pct_mes!)
+      .sort(
+        (a, b) => Number(b.puntualidad_pct_mes) - Number(a.puntualidad_pct_mes),
+      )
       .slice(0, 3);
 
     const mejorCalidad = [...all]
@@ -116,6 +145,18 @@ export class DashboardService {
       )
       .slice(0, 3);
 
-    return { mejorDesempeno, mejorPuntualidad, mejorCalidad };
+    // Detectar si ningún proveedor supera el umbral
+    const hayTopReales =
+      all.some((p) => Number(p.puntualidad_pct_mes) >= UMBRAL) ||
+      all.some((p) => Number(p.calidad_promedio_mes) >= UMBRAL);
+
+    return {
+      mejorDesempeno,
+      mejorPuntualidad,
+      mejorCalidad,
+      alerta: hayTopReales
+        ? null
+        : 'Ningún proveedor alcanzó los estándares de desempeño este mes (min. 85%).',
+    };
   }
 }
