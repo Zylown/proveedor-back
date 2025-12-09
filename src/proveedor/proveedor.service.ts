@@ -145,6 +145,8 @@ export class ProveedorService {
     };
 
     const saved = await this.proveedorRepo.save(payload);
+    // log para verificar el objeto guardado
+    console.log('Proveedor actualizado:', saved);
     return saved;
   }
 
