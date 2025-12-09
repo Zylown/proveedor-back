@@ -20,41 +20,36 @@ export class ProveedorService {
   ) {}
 
   async findAllPaged(query: ListProveedorQueryDtoType) {
-    const { page, limit, search, estado, categoriaId, sortBy, order } = query;
+    const { page, limit, search, categoriaId, sortBy, order } = query;
+
     const qb = this.proveedorRepo
       .createQueryBuilder('p')
-      .leftJoinAndSelect('p.categoria', 'c'); // qb = query builder
+      .leftJoinAndSelect('p.categoria', 'c')
+      .leftJoinAndSelect('p.estado', 'e'); // ← AGREGADO
 
     if (search?.trim()) {
-      // esto es para evitar búsquedas con solo espacios en blanco
       qb.andWhere(
         '(p.razon_social ILIKE :s OR p.ruc ILIKE :s OR p.email ILIKE :s OR p.telefono ILIKE :s)',
         { s: `%${search.trim()}%` },
       );
     }
 
-    if (estado) {
-      // filtro por estado
-      qb.andWhere('p.estado = :estado', { estado });
-    }
-
     if (categoriaId) {
-      // filtro por categoría
       qb.andWhere('c.id_categoria = :categoriaId', { categoriaId });
     }
 
-    const sortCol = // determinar la columna de ordenamiento
+    const sortCol =
       sortBy === 'razon_social'
         ? 'p.razon_social'
         : sortBy === 'calificacion_promedio'
           ? 'p.calificacion_promedio'
           : 'p.fecha_creacion';
 
-    qb.orderBy(sortCol, order.toUpperCase() as 'ASC' | 'DESC') // ordenamiento
+    qb.orderBy(sortCol, order.toUpperCase() as 'ASC' | 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 
-    const [items, total] = await qb.getManyAndCount(); // obtener resultados y total
+    const [items, total] = await qb.getManyAndCount();
 
     return {
       total,
@@ -154,6 +149,6 @@ export class ProveedorService {
 
   // Listar proveedores con su categoría
   async listarProveedores() {
-    return this.proveedorRepo.find({ relations: ['categoria'] });
+    return this.proveedorRepo.find({ relations: ['categoria', 'estado'] });
   }
 }

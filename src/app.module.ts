@@ -15,6 +15,7 @@ import { EvaluacionModule } from './evaluacion/evaluacion.module';
 import { CategoriaProveedorService } from './categoria-proveedor/categoria-proveedor.service';
 import { CategoriaProveedorController } from './categoria-proveedor/categoria-proveedor.controller';
 import { CategoriaProveedorModule } from './categoria-proveedor/categoria-proveedor.module';
+import { EstadoModule } from './estado/estado.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { CategoriaProveedorModule } from './categoria-proveedor/categoria-provee
     FacturaModule,
     EvaluacionModule,
     CategoriaProveedorModule,
+    EstadoModule,
   ],
 })
 export class AppModule {}
