@@ -85,7 +85,14 @@ export class ProveedorService {
     //   throw new BadRequestException(`Error de validación: ${errores}`);
     // }
     try {
-      const nuevoProveedor = this.proveedorRepo.create(data);
+      const nuevoProveedor = this.proveedorRepo.create({
+        ...data,
+        categoria: data.id_categoria
+          ? ({ id_categoria: data.id_categoria } as any)
+          : null,
+        estado: data.id_estado ? ({ id_estado: data.id_estado } as any) : null,
+      });
+
       return await this.proveedorRepo.save(nuevoProveedor);
     } catch (error) {
       // Por ejemplo, manejar error de clave duplicada
@@ -131,6 +138,9 @@ export class ProveedorService {
       ...data,
       ...(data.id_categoria
         ? { categoria: { id_categoria: data.id_categoria } as any }
+        : {}),
+      ...(data.id_estado
+        ? { estado: { id_estado: data.id_estado } as any }
         : {}),
     };
 
