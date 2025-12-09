@@ -17,8 +17,9 @@ export const CreateProveedorDto = z.object({
   email: z.string().email({ message: 'Debe ser un correo válido' }).optional(),
   contacto_principal: z.string().optional(),
   calificacion_promedio: z.number().min(0).max(5).optional(),
-  estado: z.enum(['activo', 'inactivo']).optional(),
+  // estado: z.enum(['activo', 'inactivo']).optional(),
   id_categoria: z.number().optional(),
+  id_estado: z.number().optional(),
 });
 
 export type CreateProveedorDtoType = z.infer<typeof CreateProveedorDto>;
